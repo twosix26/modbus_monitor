@@ -8,7 +8,7 @@ import select
 import time
 import json
 import os
-
+import requests
 import configparser
 from logging.config import dictConfig
 
@@ -36,7 +36,7 @@ UPDATE CONFIG:
     recv: "cmd:set_config:<target>:<value>
 """
 
-CONFIG_FILE = "config.cfg"
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.cfg")
 TCP_SERVER_PORT = 10010
 POLL_TIMEOUT = 3000  # ms
 READ_ONLY = (select.POLLIN | select.POLLPRI | select.POLLHUP | select.POLLERR)
@@ -84,7 +84,7 @@ def gen_modbus_client():
     if "method" in connect_conf and connect_conf['method'] == "rtu":
         return ModbusSerialClient(**dict(connect_conf))
     else:
-        return ModbusTcpClient(host=os.getenv("INVERTER_HOST", connect_conf['host']))
+       return ModbusTcpClient(host=os.getenv("INVERTER_HOST", connect_conf['host']))
 
 
 def gen_tcp_server(port):
@@ -238,13 +238,15 @@ def data_hub():
         logger.error("Can't connect to device")
         return None
     # client.connect()
-    with open("data_map.json", "r") as f:
+    data_map_path = os.path.join(os.path.dirname(__file__), "data_map2.json")
+    with open(data_map_path, "r") as f:
         data_map = json.loads(f.read())
 
     while True:
         get_all_data(client, data_map)
         time.sleep(10)
 
+# def post_data():
 
 def get_all_data(client, data_map):
     for k, v in data_map.items():
@@ -269,7 +271,7 @@ def get_all_data(client, data_map):
 if __name__ == '__main__':
     gevent.joinall([
         gevent.spawn(cmd_server),
-        # gevent.spawn(data_hub)
+        gevent.spawn(data_hub)
     ])
 
 
