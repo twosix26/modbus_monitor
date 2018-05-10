@@ -1,4 +1,4 @@
-{
+{ 
   "8000": {"define": "给定速度", "unit": "rpm", "type": "UINT", "digits": 0},
   "8001": {"define": "直流母线电压", "unit": "V", "type": "UINT", "digits": 1},
   "8005": {"define": "内腔湿度", "unit": "%", "type": "UINT", "digits": 1},
